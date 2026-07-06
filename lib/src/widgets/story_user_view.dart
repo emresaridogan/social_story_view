@@ -581,9 +581,12 @@ class _StoryUserViewState extends State<StoryUserView>
                               item: item,
                               onClose: widget.onClosePressed,
                               style: widget.headerStyle,
-                              showAvatar: widget.headerConfig.showAvatar,
-                              showUsername: widget.headerConfig.showUsername,
-                              showTimestamp: widget.headerConfig.showTimestamp,
+                              showAvatar: widget.headerConfig.showUserInfo &&
+                                  widget.headerConfig.showAvatar,
+                              showUsername: widget.headerConfig.showUserInfo &&
+                                  widget.headerConfig.showUsername,
+                              showTimestamp: widget.headerConfig.showUserInfo &&
+                                  widget.headerConfig.showTimestamp,
                               showCloseButton:
                                   widget.headerConfig.showCloseButton,
                             ),

@@ -78,7 +78,8 @@ void main() {
     );
     await tester.pump();
     // Advance past the 2s duration of the first story.
-    await tester.pump(const Duration(seconds: 3));
+    await tester.pump(const Duration(seconds: 4));
+    await tester.pump();
     expect(completed, greaterThanOrEqualTo(1));
     expect(find.text('two'), findsOneWidget);
   });
@@ -93,5 +94,22 @@ void main() {
     await tester.pump();
     await tester.pump();
     expect(find.text('two'), findsOneWidget);
+  });
+
+  testWidgets('header user info can be hidden with showUserInfo',
+      (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        StoryView(
+          users: _users(),
+          headerConfig: const StoryHeaderConfig(showUserInfo: false),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.text('alice'), findsNothing);
+    expect(find.byType(CircleAvatar), findsNothing);
+    expect(find.byIcon(Icons.close), findsOneWidget);
   });
 }

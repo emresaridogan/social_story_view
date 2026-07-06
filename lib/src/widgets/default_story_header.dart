@@ -9,11 +9,18 @@ import '../models/story_user.dart';
 class StoryHeaderConfig {
   /// Creates a header configuration.
   const StoryHeaderConfig({
+    this.showUserInfo = true,
     this.showAvatar = true,
     this.showUsername = true,
     this.showTimestamp = true,
     this.showCloseButton = true,
   });
+
+  /// Whether the user info block is shown (avatar + username + timestamp).
+  ///
+  /// When `false`, [showAvatar], [showUsername] and [showTimestamp] are
+  /// ignored.
+  final bool showUserInfo;
 
   /// Whether the user's avatar is shown.
   final bool showAvatar;
