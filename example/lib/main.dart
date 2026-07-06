@@ -119,6 +119,7 @@ class _FeedScreenState extends State<FeedScreen> {
       context,
       users: _users,
       controller: controller,
+      useRootNavigator: true,
       initialUserIndex: index,
       transition: StoryTransition.cube,
       theme: theme,

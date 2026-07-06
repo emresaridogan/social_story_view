@@ -41,10 +41,14 @@ Future<void> showStoryView(
   OnAllStoriesComplete? onAllStoriesComplete,
   OnStorySwipeUp? onSwipeUp,
   OnStoryLinkTap? onLinkTap,
+  bool useRootNavigator = true,
+  bool fullscreenDialog = true,
+  bool opaque = true,
 }) {
-  return Navigator.of(context).push<void>(
+  return Navigator.of(context, rootNavigator: useRootNavigator).push<void>(
     PageRouteBuilder<void>(
-      opaque: false,
+      opaque: opaque,
+      fullscreenDialog: fullscreenDialog,
       barrierColor: Colors.transparent,
       transitionDuration: const Duration(milliseconds: 250),
       pageBuilder: (context, animation, secondaryAnimation) {
