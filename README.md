@@ -159,6 +159,8 @@ Every `StoryItem` also accepts:
 - `isViewed` — whether the story is already seen (drives the ring color).
 - `metadata` — a free-form `Map<String, dynamic>` you can read in your overlay
   builder (e.g. campaign title, date range, body copy).
+- `detailPhotoUrl` — an optional image URL you can use for a separate linked
+  detail page.
 - `link` — an optional [`StoryLink`](#link-call-to-action) call-to-action.
 
 `StoryItem` supports `copyWith`, `toJson` / `fromJson`.

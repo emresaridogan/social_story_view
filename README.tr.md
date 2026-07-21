@@ -158,6 +158,8 @@ Her `StoryItem` ayrıca şunları kabul eder:
 - `isViewed` — hikâyenin görülüp görülmediği (halka rengini belirler).
 - `metadata` — overlay builder'ında okuyabileceğin serbest biçimli bir
   `Map<String, dynamic>` (örn. kampanya başlığı, tarih aralığı, metin).
+- `detailPhotoUrl` — bağlantılı ayrı bir detay sayfası için kullanılabilecek
+  opsiyonel görsel URL'si.
 - `link` — opsiyonel bir [`StoryLink`](#bağlantı--cta-butonu) CTA'sı.
 
 `StoryItem`; `copyWith`, `toJson` / `fromJson` destekler.

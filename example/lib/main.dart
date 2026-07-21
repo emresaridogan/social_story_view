@@ -12,10 +12,7 @@ class DemoApp extends StatelessWidget {
     return MaterialApp(
       title: 'social_story_view demo',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorSchemeSeed: const Color(0xFFD62976),
-        useMaterial3: true,
-      ),
+      theme: ThemeData(colorSchemeSeed: const Color(0xFFD62976), useMaterial3: true),
       home: const FeedScreen(),
     );
   }
@@ -44,10 +41,7 @@ List<StoryUser> buildMockUsers() {
           url: img(11),
           duration: const Duration(seconds: 5),
           createdAt: DateTime.now().subtract(const Duration(minutes: 10)),
-          link: const StoryLink(
-            url: 'https://flutter.dev',
-            label: 'Detayları incele',
-          ),
+          link: const StoryLink(url: 'https://flutter.dev', label: 'Detayları incele'),
           metadata: const <String, Object?>{
             'title': 'İkinci Periyodik Bakımınızda %5 İndirim!',
             'dateRange': '01.06.2025 - 01.06.2026',
@@ -77,8 +71,7 @@ List<StoryUser> buildMockUsers() {
       stories: <StoryItem>[
         StoryItem.video(
           id: 'u2-1',
-          url:
-              'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
+          url: 'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
           createdAt: DateTime.now().subtract(const Duration(hours: 2)),
         ),
         StoryItem.image(id: 'u2-2', url: img(22)),
@@ -109,8 +102,7 @@ class _FeedScreenState extends State<FeedScreen> {
   late List<StoryUser> _users = buildMockUsers();
   bool _lightTheme = false;
 
-  StoryViewTheme get _theme =>
-      _lightTheme ? StoryViewTheme.light() : StoryViewTheme.dark();
+  StoryViewTheme get _theme => _lightTheme ? StoryViewTheme.light() : StoryViewTheme.dark();
 
   void _openViewer(int index) {
     final controller = StoryViewController();
@@ -124,23 +116,16 @@ class _FeedScreenState extends State<FeedScreen> {
       transition: StoryTransition.cube,
       theme: theme,
       onStoryShow: (user, item, i) => _markViewed(user.id, item.id),
-      onStoryComplete: (user, item, i) =>
-          debugPrint('Completed ${user.username} / ${item.id}'),
-      onAllStoriesComplete: (user) =>
-          debugPrint('All stories of ${user.username} complete'),
-      onSwipeUp: (user, item) =>
-          debugPrint('Swiped up on ${user.username} / ${item.id}'),
+      onStoryComplete: (user, item, i) => debugPrint('Completed ${user.username} / ${item.id}'),
+      onAllStoriesComplete: (user) => debugPrint('All stories of ${user.username} complete'),
+      onSwipeUp: (user, item) => debugPrint('Swiped up on ${user.username} / ${item.id}'),
       overlayBuilder: (context, user, item, i) {
         // Render a marketing-style text overlay only for items that carry
         // campaign metadata; other stories get no overlay.
         final meta = item.metadata;
         if (meta == null || meta['title'] == null) return const SizedBox();
-        final onMedia = theme.brightness == Brightness.light
-            ? const Color(0xFF1A1A1A)
-            : Colors.white;
-        final onMediaMuted = theme.brightness == Brightness.light
-            ? const Color(0xFF5C5C5C)
-            : Colors.white70;
+        final onMedia = theme.brightness == Brightness.light ? const Color(0xFF1A1A1A) : Colors.white;
+        final onMediaMuted = theme.brightness == Brightness.light ? const Color(0xFF5C5C5C) : Colors.white70;
         return SafeArea(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(24, 156, 24, 24),
@@ -149,47 +134,26 @@ class _FeedScreenState extends State<FeedScreen> {
               children: <Widget>[
                 Text(
                   meta['title']! as String,
-                  style: TextStyle(
-                    color: onMedia,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(color: onMedia, fontSize: 22, fontWeight: FontWeight.bold),
                 ),
                 if (meta['dateRange'] != null) ...<Widget>[
                   const SizedBox(height: 6),
-                  Text(
-                    meta['dateRange']! as String,
-                    style: TextStyle(color: onMediaMuted, fontSize: 14),
-                  ),
+                  Text(meta['dateRange']! as String, style: TextStyle(color: onMediaMuted, fontSize: 14)),
                 ],
                 if (meta['body'] != null) ...<Widget>[
                   const SizedBox(height: 18),
-                  Text(
-                    meta['body']! as String,
-                    style: TextStyle(color: onMedia, fontSize: 16, height: 1.4),
-                  ),
+                  Text(meta['body']! as String, style: TextStyle(color: onMedia, fontSize: 16, height: 1.4)),
                   ElevatedButton(
                     onPressed: () {
-                      launchUrl(
-                        Uri.tryParse('https://flutter.dev') ??
-                            Uri.parse('https://flutter.dev'),
-                      );
+                      launchUrl(Uri.tryParse('https://flutter.dev') ?? Uri.parse('https://flutter.dev'));
                       debugPrint('CTA pressed');
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       foregroundColor: Colors.black87,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                     ),
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      child: Text('İncele'),
-                    ),
+                    child: const Padding(padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8), child: Text('İncele')),
                   ),
                 ],
               ],
@@ -203,19 +167,14 @@ class _FeedScreenState extends State<FeedScreen> {
         return StoryReplyBar(
           hintText: 'Reply to ${user.username}...',
           style: theme.replyBarStyle,
-          onFocusChanged: (focused) =>
-              focused ? controller.pause() : controller.resume(),
+          onFocusChanged: (focused) => focused ? controller.pause() : controller.resume(),
           onReaction: (emoji) {
             controller.resume();
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Reacted $emoji to ${user.username}')),
-            );
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Reacted $emoji to ${user.username}')));
           },
           onSubmitted: (text) {
             controller.resume();
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Replied "$text" to ${user.username}')),
-            );
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Replied "$text" to ${user.username}')));
           },
         );
       },
@@ -229,11 +188,7 @@ class _FeedScreenState extends State<FeedScreen> {
     setState(() {
       _users = _users.map((u) {
         if (u.id != userId) return u;
-        return u.copyWith(
-          stories: u.stories
-              .map((s) => s.id == storyId ? s.copyWith(isViewed: true) : s)
-              .toList(),
-        );
+        return u.copyWith(stories: u.stories.map((s) => s.id == storyId ? s.copyWith(isViewed: true) : s).toList());
       }).toList();
     });
   }
@@ -258,9 +213,7 @@ class _FeedScreenState extends State<FeedScreen> {
             users: _users,
             style: _theme.avatarStyle,
             onAvatarTap: (user, index) => _openViewer(index),
-            onAddTap: () => ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('Add to your story'))),
+            onAddTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Add to your story'))),
           ),
           const Divider(height: 1),
           const Expanded(

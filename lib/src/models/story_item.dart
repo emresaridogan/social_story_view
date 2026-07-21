@@ -23,6 +23,7 @@ class StoryItem {
     required this.id,
     required this.type,
     this.url = '',
+    this.detailPhotoUrl = '',
     this.source = StorySource.network,
     this.duration,
     this.text,
@@ -39,7 +40,8 @@ class StoryItem {
   /// Convenience constructor for an image story.
   factory StoryItem.image({
     required String id,
-    required String url,
+    String url = '',
+    String detailPhotoUrl = '',
     StorySource source = StorySource.network,
     Duration duration = kDefaultStoryDuration,
     DateTime? createdAt,
@@ -52,6 +54,7 @@ class StoryItem {
       id: id,
       type: StoryMediaType.image,
       url: url,
+      detailPhotoUrl: detailPhotoUrl,
       source: source,
       duration: duration,
       createdAt: createdAt,
@@ -130,6 +133,9 @@ class StoryItem {
   /// Location of the media. Empty for [StoryMediaType.text].
   final String url;
 
+  /// Location of the media detail photo. Empty for [StoryMediaType.text].
+  final String detailPhotoUrl;
+
   /// Where [url] should be resolved from.
   final StorySource source;
 
@@ -151,8 +157,7 @@ class StoryItem {
   final DateTime? _createdAt;
 
   /// When this story was created. Defaults to the epoch if not provided.
-  DateTime get createdAt =>
-      _createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+  DateTime get createdAt => _createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
 
   /// Whether this story has already been seen by the current user.
   final bool isViewed;
@@ -178,6 +183,7 @@ class StoryItem {
     String? id,
     StoryMediaType? type,
     String? url,
+    String? detailPhotoUrl,
     StorySource? source,
     Duration? duration,
     String? text,
@@ -194,6 +200,7 @@ class StoryItem {
       id: id ?? this.id,
       type: type ?? this.type,
       url: url ?? this.url,
+      detailPhotoUrl: detailPhotoUrl ?? this.detailPhotoUrl,
       source: source ?? this.source,
       duration: duration ?? this.duration,
       text: text ?? this.text,
@@ -219,23 +226,18 @@ class StoryItem {
         (e) => e.name == json['type'],
         orElse: () => StoryMediaType.image,
       ),
-      url: (json['url'] as String?) ?? '',
+      url: (json['storyPhotoUrl'] as String?) ?? '',
+      detailPhotoUrl: (json['storyDetailPhotoUrl'] as String?) ?? '',
       source: StorySource.values.firstWhere(
         (e) => e.name == json['source'],
         orElse: () => StorySource.network,
       ),
-      duration: json['durationMs'] != null
-          ? Duration(milliseconds: (json['durationMs'] as num).toInt())
-          : null,
+      duration: json['durationMs'] != null ? Duration(milliseconds: (json['durationMs'] as num).toInt()) : null,
       text: json['text'] as String?,
-      createdAt: json['createdAt'] != null
-          ? DateTime.tryParse(json['createdAt'] as String)
-          : null,
+      createdAt: json['createdAt'] != null ? DateTime.tryParse(json['createdAt'] as String) : null,
       isViewed: (json['isViewed'] as bool?) ?? false,
       metadata: (json['metadata'] as Map?)?.cast<String, Object?>(),
-      link: json['link'] != null
-          ? StoryLink.fromJson((json['link'] as Map).cast<String, dynamic>())
-          : null,
+      link: json['link'] != null ? StoryLink.fromJson((json['link'] as Map).cast<String, dynamic>()) : null,
     );
   }
 
@@ -244,7 +246,8 @@ class StoryItem {
     return <String, dynamic>{
       'id': id,
       'type': type.name,
-      'url': url,
+      'storyPhotoUrl': url,
+      'storyDetailPhotoUrl': detailPhotoUrl,
       'source': source.name,
       'durationMs': duration?.inMilliseconds,
       'text': text,
@@ -262,12 +265,12 @@ class StoryItem {
           other.id == id &&
           other.type == type &&
           other.url == url &&
+          other.detailPhotoUrl == detailPhotoUrl &&
           other.isViewed == isViewed;
 
   @override
-  int get hashCode => Object.hash(id, type, url, isViewed);
+  int get hashCode => Object.hash(id, type, url, detailPhotoUrl, isViewed);
 
   @override
-  String toString() =>
-      'StoryItem(id: $id, type: ${type.name}, isViewed: $isViewed)';
+  String toString() => 'StoryItem(id: $id, type: ${type.name}, url: $url, detailPhotoUrl: $detailPhotoUrl, isViewed: $isViewed)';
 }

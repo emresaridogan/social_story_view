@@ -1,5 +1,5 @@
-import 'package:social_story_view/social_story_view.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:social_story_view/social_story_view.dart';
 
 void main() {
   group('StoryItem', () {
@@ -7,6 +7,7 @@ void main() {
       final item = StoryItem.image(
         id: 'a',
         url: 'https://example.com/a.jpg',
+        detailPhotoUrl: 'https://example.com/a-detail.jpg',
         duration: const Duration(seconds: 7),
         isViewed: true,
       );
@@ -14,6 +15,7 @@ void main() {
       expect(decoded.id, 'a');
       expect(decoded.type, StoryMediaType.image);
       expect(decoded.url, 'https://example.com/a.jpg');
+      expect(decoded.detailPhotoUrl, 'https://example.com/a-detail.jpg');
       expect(decoded.duration, const Duration(seconds: 7));
       expect(decoded.isViewed, isTrue);
     });
@@ -57,9 +59,7 @@ void main() {
     });
 
     test('isFullyViewed reflects all stories seen', () {
-      final u = user()
-          .markStoryViewed(1)
-          .markStoryViewed(2);
+      final u = user().markStoryViewed(1).markStoryViewed(2);
       expect(u.isFullyViewed, isTrue);
       expect(u.hasUnseen, isFalse);
     });
@@ -119,8 +119,7 @@ class _FakeDelegate implements StoryViewControllerDelegate {
   void onPrevious() => previousCount++;
 
   @override
-  void onJumpTo(int userIndex, int storyIndex) =>
-      jumpTo = <int>[userIndex, storyIndex];
+  void onJumpTo(int userIndex, int storyIndex) => jumpTo = <int>[userIndex, storyIndex];
 
   @override
   void onClose() => closed = true;
