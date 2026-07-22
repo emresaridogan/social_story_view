@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 /// A tappable call-to-action attached to a [StoryItem].
 ///
 /// Renders as a pill/button overlay above the story content. Tapping it opens
-/// [url] in the browser (or is handled by `StoryView.onLinkTap` when provided).
+/// [url] in the browser (or is handled by `StoryView.OnStoryButtonTap` when provided).
 @immutable
 class StoryLink {
   /// Creates a story link.
@@ -75,9 +75,7 @@ class StoryLink {
       };
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is StoryLink && other.url == url && other.label == label;
+  bool operator ==(Object other) => identical(this, other) || other is StoryLink && other.url == url && other.label == label;
 
   @override
   int get hashCode => Object.hash(url, label);

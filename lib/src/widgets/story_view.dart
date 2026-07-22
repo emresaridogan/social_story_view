@@ -52,7 +52,7 @@ class StoryView extends StatefulWidget {
     this.onStoryComplete,
     this.onAllStoriesComplete,
     this.onSwipeUp,
-    this.onLinkTap,
+    this.onStoryButtonTap,
     this.onClose,
   }) : assert(users.length > 0, 'StoryView requires at least one user');
 
@@ -136,7 +136,7 @@ class StoryView extends StatefulWidget {
 
   /// Called when a story's [StoryLink] is tapped. When omitted the link is
   /// opened in the device browser.
-  final OnStoryLinkTap? onLinkTap;
+  final OnStoryButtonTap? onStoryButtonTap;
 
   /// Called when the viewer is closed. When omitted, the viewer tries to pop
   /// the enclosing route.
@@ -146,9 +146,7 @@ class StoryView extends StatefulWidget {
   State<StoryView> createState() => _StoryViewState();
 }
 
-class _StoryViewState extends State<StoryView>
-    with WidgetsBindingObserver
-    implements StoryViewControllerDelegate {
+class _StoryViewState extends State<StoryView> with WidgetsBindingObserver implements StoryViewControllerDelegate {
   late final PageController _pageController;
   late final StoryViewController _controller;
   bool _ownsController = false;
@@ -165,19 +163,15 @@ class _StoryViewState extends State<StoryView>
   double _dragDy = 0;
 
   // Theme-resolved values (explicit params win over the theme).
-  StoryProgressStyle get _progressStyle =>
-      widget.progressStyle ?? widget.theme.progressStyle;
-  Color get _backgroundColor =>
-      widget.backgroundColor ?? widget.theme.backgroundColor;
-  StoryHeaderStyle get _headerStyle =>
-      widget.headerStyle ?? widget.theme.headerStyle;
+  StoryProgressStyle get _progressStyle => widget.progressStyle ?? widget.theme.progressStyle;
+  Color get _backgroundColor => widget.backgroundColor ?? widget.theme.backgroundColor;
+  StoryHeaderStyle get _headerStyle => widget.headerStyle ?? widget.theme.headerStyle;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _currentUserIndex =
-        widget.initialUserIndex.clamp(0, widget.users.length - 1);
+    _currentUserIndex = widget.initialUserIndex.clamp(0, widget.users.length - 1);
     _settledUserIndex = _currentUserIndex;
     _pageController = PageController(initialPage: _currentUserIndex);
 
@@ -186,8 +180,7 @@ class _StoryViewState extends State<StoryView>
     _controller.attach(this);
 
     // Resolve initial story index for the first user.
-    _startIndices[_currentUserIndex] = widget.initialStoryIndex ??
-        widget.users[_currentUserIndex].firstUnseenIndex;
+    _startIndices[_currentUserIndex] = widget.initialStoryIndex ?? widget.users[_currentUserIndex].firstUnseenIndex;
 
     WidgetsBinding.instance.addPostFrameCallback((_) => _precacheNeighbors());
   }
@@ -210,8 +203,7 @@ class _StoryViewState extends State<StoryView>
     }
   }
 
-  int _startIndexFor(int userIndex) =>
-      _startIndices[userIndex] ?? widget.users[userIndex].firstUnseenIndex;
+  int _startIndexFor(int userIndex) => _startIndices[userIndex] ?? widget.users[userIndex].firstUnseenIndex;
 
   // --- StoryViewControllerDelegate -----------------------------------------
 
@@ -267,8 +259,7 @@ class _StoryViewState extends State<StoryView>
       final previousIndex = _currentUserIndex - 1;
       // Resume the previous user from their last story instead of restarting
       // from the beginning.
-      _startIndices[previousIndex] =
-          widget.users[previousIndex].stories.length - 1;
+      _startIndices[previousIndex] = widget.users[previousIndex].stories.length - 1;
       _animateToUser(previousIndex);
     }
   }
@@ -285,8 +276,7 @@ class _StoryViewState extends State<StoryView>
   void _onSettled() {
     if (_settledUserIndex != _currentUserIndex) {
       setState(() => _settledUserIndex = _currentUserIndex);
-      _controller.syncPosition(
-          _currentUserIndex, _startIndexFor(_currentUserIndex));
+      _controller.syncPosition(_currentUserIndex, _startIndexFor(_currentUserIndex));
     } else {
       // The page snapped back to where it started; resume the current story.
       _activePlayback?.resume(StoryPauseReason.hold);
@@ -314,8 +304,7 @@ class _StoryViewState extends State<StoryView>
     if (!mounted) return;
     final candidates = <StoryUser>[
       widget.users[_currentUserIndex],
-      if (_currentUserIndex + 1 < widget.users.length)
-        widget.users[_currentUserIndex + 1],
+      if (_currentUserIndex + 1 < widget.users.length) widget.users[_currentUserIndex + 1],
       if (_currentUserIndex - 1 >= 0) widget.users[_currentUserIndex - 1],
     ];
     for (final user in candidates) {
@@ -323,8 +312,7 @@ class _StoryViewState extends State<StoryView>
         if (story.source != StorySource.network || story.url.isEmpty) continue;
         switch (story.type) {
           case StoryMediaType.image:
-            precacheImage(CachedNetworkImageProvider(story.url), context)
-                .catchError((_) {});
+            precacheImage(CachedNetworkImageProvider(story.url), context).catchError((_) {});
           case StoryMediaType.video:
             // Pre-download the video file so it plays instantly without a
             // loading spinner when the story is opened.
@@ -382,8 +370,7 @@ class _StoryViewState extends State<StoryView>
   }
 
   bool _onScrollNotification(ScrollNotification notification) {
-    if (notification is ScrollStartNotification &&
-        notification.dragDetails != null) {
+    if (notification is ScrollStartNotification && notification.dragDetails != null) {
       _activePlayback?.pause(StoryPauseReason.hold);
     } else if (notification is ScrollEndNotification) {
       _onSettled();
@@ -412,8 +399,7 @@ class _StoryViewState extends State<StoryView>
             Positioned.fill(
               child: IgnorePointer(
                 child: ColoredBox(
-                  color:
-                      _backgroundColor.withValues(alpha: 1 - dismissProgress),
+                  color: _backgroundColor.withValues(alpha: 1 - dismissProgress),
                 ),
               ),
             ),
@@ -422,8 +408,7 @@ class _StoryViewState extends State<StoryView>
               child: Transform.scale(
                 scale: 1 - dismissProgress * 0.1,
                 child: ClipRRect(
-                  borderRadius:
-                      BorderRadius.circular(dismissProgress > 0 ? 16 : 0),
+                  borderRadius: BorderRadius.circular(dismissProgress > 0 ? 16 : 0),
                   child: NotificationListener<ScrollNotification>(
                     onNotification: _onScrollNotification,
                     child: PageView.builder(
@@ -435,8 +420,7 @@ class _StoryViewState extends State<StoryView>
                           animation: _pageController,
                           builder: (context, child) {
                             double page = index.toDouble();
-                            if (_pageController.hasClients &&
-                                _pageController.position.haveDimensions) {
+                            if (_pageController.hasClients && _pageController.position.haveDimensions) {
                               page = _pageController.page ?? page;
                             }
                             final offset = index - page;
@@ -462,8 +446,7 @@ class _StoryViewState extends State<StoryView>
                             onAllStoriesComplete: _handleAllStoriesComplete,
                             onRequestNextUser: _requestNextUser,
                             onRequestPreviousUser: _requestPreviousUser,
-                            onPositionChanged: (storyIndex) => _controller
-                                .syncPosition(_currentUserIndex, storyIndex),
+                            onPositionChanged: (storyIndex) => _controller.syncPosition(_currentUserIndex, storyIndex),
                             headerBuilder: widget.headerBuilder,
                             footerBuilder: widget.footerBuilder,
                             overlayBuilder: widget.overlayBuilder,
@@ -474,8 +457,7 @@ class _StoryViewState extends State<StoryView>
                             headerStyle: _headerStyle,
                             topScrimColor: widget.theme.topScrimColor,
                             bottomScrimColor: widget.theme.bottomScrimColor,
-                            onLinkTap: (item, link) =>
-                                _handleLinkTap(widget.users[index], item, link),
+                            onStoryButtonTap: (item, link) => _handleLinkTap(widget.users[index], item, link),
                           ),
                         );
                       },
@@ -503,8 +485,8 @@ class _StoryViewState extends State<StoryView>
   }
 
   void _handleLinkTap(StoryUser user, StoryItem item, StoryLink link) {
-    if (widget.onLinkTap != null) {
-      widget.onLinkTap!(user, item, link);
+    if (widget.onStoryButtonTap != null) {
+      widget.onStoryButtonTap!(user, item, link);
       return;
     }
     // Default behaviour: pause playback and open the link in the browser.

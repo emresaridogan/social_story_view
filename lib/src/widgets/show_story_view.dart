@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../controllers/story_view_controller.dart';
 import '../models/story_callbacks.dart';
 import '../models/story_progress_style.dart';
 import '../models/story_transition.dart';
@@ -7,8 +8,6 @@ import '../models/story_user.dart';
 import '../models/story_view_theme.dart';
 import 'default_story_header.dart';
 import 'story_view.dart';
-
-import '../controllers/story_view_controller.dart';
 
 /// Pushes a full-screen [StoryView] as a modal route and returns a future that
 /// completes when the viewer is dismissed.
@@ -40,7 +39,7 @@ Future<void> showStoryView(
   OnStoryComplete? onStoryComplete,
   OnAllStoriesComplete? onAllStoriesComplete,
   OnStorySwipeUp? onSwipeUp,
-  OnStoryLinkTap? onLinkTap,
+  OnStoryButtonTap? onStoryButtonTap,
   bool useRootNavigator = true,
   bool fullscreenDialog = true,
   bool opaque = true,
@@ -78,7 +77,7 @@ Future<void> showStoryView(
             onStoryComplete: onStoryComplete,
             onAllStoriesComplete: onAllStoriesComplete,
             onSwipeUp: onSwipeUp,
-            onLinkTap: onLinkTap,
+            onStoryButtonTap: onStoryButtonTap,
             onClose: () => Navigator.of(context).maybePop(),
           ),
         );

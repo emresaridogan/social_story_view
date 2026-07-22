@@ -5,9 +5,9 @@ import '../controllers/story_user_playback.dart';
 import '../controllers/story_view_controller.dart' show StoryPauseReason;
 import '../models/story_callbacks.dart';
 import '../models/story_item.dart';
+import '../models/story_link.dart';
 import '../models/story_media_type.dart';
 import '../models/story_progress_style.dart';
-import '../models/story_link.dart';
 import '../models/story_user.dart';
 import 'default_story_header.dart';
 import 'story_image_content.dart';
@@ -51,7 +51,7 @@ class StoryUserView extends StatefulWidget {
     this.headerStyle = const StoryHeaderStyle(),
     this.topScrimColor = const Color(0x73000000),
     this.bottomScrimColor = const Color(0x8C000000),
-    this.onLinkTap,
+    this.onStoryButtonTap,
   });
 
   /// The user whose stories are displayed.
@@ -130,15 +130,13 @@ class StoryUserView extends StatefulWidget {
   final Color bottomScrimColor;
 
   /// Called when the story's link call-to-action is tapped.
-  final void Function(StoryItem item, StoryLink link)? onLinkTap;
+  final void Function(StoryItem item, StoryLink link)? onStoryButtonTap;
 
   @override
   State<StoryUserView> createState() => _StoryUserViewState();
 }
 
-class _StoryUserViewState extends State<StoryUserView>
-    with SingleTickerProviderStateMixin
-    implements StoryUserPlayback {
+class _StoryUserViewState extends State<StoryUserView> with SingleTickerProviderStateMixin implements StoryUserPlayback {
   late final AnimationController _animation;
   final ValueNotifier<double> _progress = ValueNotifier<double>(0);
   final Set<StoryPauseReason> _pauses = <StoryPauseReason>{};
@@ -163,8 +161,7 @@ class _StoryUserViewState extends State<StoryUserView>
   /// reopened. Buffering naturally freezes progress (the position stops
   /// advancing) without us pausing the controller, so the player keeps working
   /// to finish buffering on its own.
-  bool get _videoPaused =>
-      !widget.isActive || _pauses.any((r) => r != StoryPauseReason.buffering);
+  bool get _videoPaused => !widget.isActive || _pauses.any((r) => r != StoryPauseReason.buffering);
 
   @override
   int get currentStoryIndex => _index;
@@ -178,8 +175,7 @@ class _StoryUserViewState extends State<StoryUserView>
       ..addStatusListener(_onAnimationStatus);
     if (widget.isActive) {
       widget.onRegister(this);
-      WidgetsBinding.instance
-          .addPostFrameCallback((_) => _startStory(notify: true));
+      WidgetsBinding.instance.addPostFrameCallback((_) => _startStory(notify: true));
     }
   }
 
@@ -278,8 +274,7 @@ class _StoryUserViewState extends State<StoryUserView>
     // Only `idle` and `postFrameCallbacks` are safe phases to synchronously
     // mark the element dirty. Every other phase means a build/layout/paint pass
     // may currently be running, so we defer to the next post-frame callback.
-    final isSafePhase = phase == SchedulerPhase.idle ||
-        phase == SchedulerPhase.postFrameCallbacks;
+    final isSafePhase = phase == SchedulerPhase.idle || phase == SchedulerPhase.postFrameCallbacks;
     if (isSafePhase) {
       setState(() {});
     } else {
@@ -296,8 +291,7 @@ class _StoryUserViewState extends State<StoryUserView>
   void _setProgress(double value) {
     if (!mounted) return;
     final phase = WidgetsBinding.instance.schedulerPhase;
-    final isSafePhase = phase == SchedulerPhase.idle ||
-        phase == SchedulerPhase.postFrameCallbacks;
+    final isSafePhase = phase == SchedulerPhase.idle || phase == SchedulerPhase.postFrameCallbacks;
     if (isSafePhase) {
       _progress.value = value;
     } else {
@@ -315,8 +309,7 @@ class _StoryUserViewState extends State<StoryUserView>
   void _runSafely(VoidCallback action) {
     if (!mounted) return;
     final phase = WidgetsBinding.instance.schedulerPhase;
-    final isSafePhase = phase == SchedulerPhase.idle ||
-        phase == SchedulerPhase.postFrameCallbacks;
+    final isSafePhase = phase == SchedulerPhase.idle || phase == SchedulerPhase.postFrameCallbacks;
     if (isSafePhase) {
       action();
     } else {
@@ -459,7 +452,15 @@ class _StoryUserViewState extends State<StoryUserView>
 
   // --- Build ---------------------------------------------------------------
 
-  bool _isBottomAligned(Alignment alignment) => alignment.y > 0;
+  StoryLink? _resolvedDetailLink(StoryItem item) {
+    if (item.link != null) return item.link;
+    if (item.detailPhotoUrl.isEmpty) return null;
+    return StoryLink(
+      url: item.detailPhotoUrl,
+      label: 'Detayı Gör',
+      alignment: Alignment.bottomCenter,
+    );
+  }
 
   Widget _buildContent() {
     final item = _item;
@@ -476,14 +477,8 @@ class _StoryUserViewState extends State<StoryUserView>
             fit: widget.contentFit,
             onLoaded: _onMediaLoaded,
             onError: _onMediaError,
-            loadingBuilder: widget.loadingBuilder == null
-                ? null
-                : (context) =>
-                    widget.loadingBuilder!(context, widget.user, item),
-            errorBuilder: widget.errorBuilder == null
-                ? null
-                : (context, error) =>
-                    widget.errorBuilder!(context, widget.user, item, error),
+            loadingBuilder: widget.loadingBuilder == null ? null : (context) => widget.loadingBuilder!(context, widget.user, item),
+            errorBuilder: widget.errorBuilder == null ? null : (context, error) => widget.errorBuilder!(context, widget.user, item, error),
           ),
         );
       case StoryMediaType.video:
@@ -501,14 +496,8 @@ class _StoryUserViewState extends State<StoryUserView>
             onCompleted: _onVideoCompleted,
             onBuffering: _onVideoBuffering,
             onError: _onMediaError,
-            loadingBuilder: widget.loadingBuilder == null
-                ? null
-                : (context) =>
-                    widget.loadingBuilder!(context, widget.user, item),
-            errorBuilder: widget.errorBuilder == null
-                ? null
-                : (context, error) =>
-                    widget.errorBuilder!(context, widget.user, item, error),
+            loadingBuilder: widget.loadingBuilder == null ? null : (context) => widget.loadingBuilder!(context, widget.user, item),
+            errorBuilder: widget.errorBuilder == null ? null : (context, error) => widget.errorBuilder!(context, widget.user, item, error),
           ),
         );
     }
@@ -517,6 +506,7 @@ class _StoryUserViewState extends State<StoryUserView>
   @override
   Widget build(BuildContext context) {
     final item = _item;
+    final detailLink = _resolvedDetailLink(item);
     return LayoutBuilder(
       builder: (context, constraints) {
         return GestureDetector(
@@ -532,17 +522,14 @@ class _StoryUserViewState extends State<StoryUserView>
               // titles or marketing copy placed on top of the image/video).
               if (widget.overlayBuilder != null)
                 Positioned.fill(
-                  child: widget.overlayBuilder!(
-                      context, widget.user, item, _index),
+                  child: widget.overlayBuilder!(context, widget.user, item, _index),
                 ),
               // Tappable call-to-action link for non-bottom alignments.
-              if (item.link != null &&
-                  widget.onLinkTap != null &&
-                  !_isBottomAligned(item.link!.alignment))
+              if (item.showDetailButton)
                 Positioned.fill(
                   child: StoryLinkButton(
-                    link: item.link!,
-                    onTap: () => widget.onLinkTap!(item, item.link!),
+                    link: detailLink ?? StoryLink(url: '', label: ''),
+                    onTap: () => detailLink != null ? widget.onStoryButtonTap!(item, detailLink) : null,
                   ),
                 ),
               // Overlays (do not absorb taps unless their own children do).
@@ -574,21 +561,16 @@ class _StoryUserViewState extends State<StoryUserView>
                         ),
                       ),
                       widget.headerBuilder != null
-                          ? widget.headerBuilder!(
-                              context, widget.user, item, _index)
+                          ? widget.headerBuilder!(context, widget.user, item, _index)
                           : DefaultStoryHeader(
                               user: widget.user,
                               item: item,
                               onClose: widget.onClosePressed,
                               style: widget.headerStyle,
-                              showAvatar: widget.headerConfig.showUserInfo &&
-                                  widget.headerConfig.showAvatar,
-                              showUsername: widget.headerConfig.showUserInfo &&
-                                  widget.headerConfig.showUsername,
-                              showTimestamp: widget.headerConfig.showUserInfo &&
-                                  widget.headerConfig.showTimestamp,
-                              showCloseButton:
-                                  widget.headerConfig.showCloseButton,
+                              showAvatar: widget.headerConfig.showUserInfo && widget.headerConfig.showAvatar,
+                              showUsername: widget.headerConfig.showUserInfo && widget.headerConfig.showUsername,
+                              showTimestamp: widget.headerConfig.showUserInfo && widget.headerConfig.showTimestamp,
+                              showCloseButton: widget.headerConfig.showCloseButton,
                             ),
                     ],
                   ),
@@ -596,10 +578,7 @@ class _StoryUserViewState extends State<StoryUserView>
               ),
               // Bottom-aligned call-to-action link sits above the footer
               // (reply bar) so it is never hidden behind the message input.
-              if ((item.link != null &&
-                      widget.onLinkTap != null &&
-                      _isBottomAligned(item.link!.alignment)) ||
-                  widget.footerBuilder != null)
+              if ((item.showDetailButton) || widget.footerBuilder != null)
                 Positioned(
                   bottom: 0,
                   left: 0,
@@ -618,16 +597,13 @@ class _StoryUserViewState extends State<StoryUserView>
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        if (item.link != null &&
-                            widget.onLinkTap != null &&
-                            _isBottomAligned(item.link!.alignment))
+                        if (item.showDetailButton)
                           StoryLinkButton(
-                            link: item.link!,
-                            onTap: () => widget.onLinkTap!(item, item.link!),
+                            link: detailLink ?? StoryLink(url: '', label: ''),
+                            onTap: () =>
+                                widget.onStoryButtonTap != null && detailLink != null ? widget.onStoryButtonTap!(item, detailLink) : null,
                           ),
-                        if (widget.footerBuilder != null)
-                          widget.footerBuilder!(
-                              context, widget.user, item, _index),
+                        if (widget.footerBuilder != null) widget.footerBuilder!(context, widget.user, item, _index),
                       ],
                     ),
                   ),

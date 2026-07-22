@@ -83,7 +83,7 @@ typedef OnStorySwipeUp = void Function(StoryUser user, StoryItem item);
 ///
 /// Return `true` if you handled the tap yourself; return `false` (or use the
 /// default handler) to let the viewer open the link in the browser.
-typedef OnStoryLinkTap = void Function(
+typedef OnStoryButtonTap = void Function(
   StoryUser user,
   StoryItem item,
   StoryLink link,

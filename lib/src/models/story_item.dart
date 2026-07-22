@@ -24,6 +24,7 @@ class StoryItem {
     required this.type,
     this.url = '',
     this.detailPhotoUrl = '',
+    this.showDetailButton = false,
     this.source = StorySource.network,
     this.duration,
     this.text,
@@ -42,6 +43,7 @@ class StoryItem {
     required String id,
     String url = '',
     String detailPhotoUrl = '',
+    bool showDetailButton = false,
     StorySource source = StorySource.network,
     Duration duration = kDefaultStoryDuration,
     DateTime? createdAt,
@@ -55,6 +57,7 @@ class StoryItem {
       type: StoryMediaType.image,
       url: url,
       detailPhotoUrl: detailPhotoUrl,
+      showDetailButton: showDetailButton,
       source: source,
       duration: duration,
       createdAt: createdAt,
@@ -72,6 +75,8 @@ class StoryItem {
   factory StoryItem.video({
     required String id,
     required String url,
+    String detailPhotoUrl = '',
+    bool showDetailButton = false,
     StorySource source = StorySource.network,
     Duration? duration,
     DateTime? createdAt,
@@ -84,6 +89,8 @@ class StoryItem {
       id: id,
       type: StoryMediaType.video,
       url: url,
+      detailPhotoUrl: detailPhotoUrl,
+      showDetailButton: showDetailButton,
       source: source,
       duration: duration,
       createdAt: createdAt,
@@ -98,6 +105,8 @@ class StoryItem {
   factory StoryItem.text({
     required String id,
     required String text,
+    String detailPhotoUrl = '',
+    bool showDetailButton = false,
     Color? backgroundColor,
     Gradient? gradient,
     TextStyle? textStyle,
@@ -111,6 +120,8 @@ class StoryItem {
     return StoryItem(
       id: id,
       type: StoryMediaType.text,
+      detailPhotoUrl: detailPhotoUrl,
+      showDetailButton: showDetailButton,
       text: text,
       backgroundColor: backgroundColor,
       gradient: gradient,
@@ -135,6 +146,9 @@ class StoryItem {
 
   /// Location of the media detail photo. Empty for [StoryMediaType.text].
   final String detailPhotoUrl;
+
+  /// Whether a detail button should be shown for this story.
+  final bool showDetailButton;
 
   /// Where [url] should be resolved from.
   final StorySource source;
@@ -184,6 +198,7 @@ class StoryItem {
     StoryMediaType? type,
     String? url,
     String? detailPhotoUrl,
+    bool? showDetailButton,
     StorySource? source,
     Duration? duration,
     String? text,
@@ -201,6 +216,7 @@ class StoryItem {
       type: type ?? this.type,
       url: url ?? this.url,
       detailPhotoUrl: detailPhotoUrl ?? this.detailPhotoUrl,
+      showDetailButton: showDetailButton ?? this.showDetailButton,
       source: source ?? this.source,
       duration: duration ?? this.duration,
       text: text ?? this.text,
@@ -228,6 +244,7 @@ class StoryItem {
       ),
       url: (json['storyPhotoUrl'] as String?) ?? '',
       detailPhotoUrl: (json['storyDetailPhotoUrl'] as String?) ?? '',
+      showDetailButton: (json['showDetailButton'] as bool?) ?? false,
       source: StorySource.values.firstWhere(
         (e) => e.name == json['source'],
         orElse: () => StorySource.network,
@@ -248,6 +265,7 @@ class StoryItem {
       'type': type.name,
       'storyPhotoUrl': url,
       'storyDetailPhotoUrl': detailPhotoUrl,
+      'showDetailButton': showDetailButton,
       'source': source.name,
       'durationMs': duration?.inMilliseconds,
       'text': text,
@@ -266,10 +284,11 @@ class StoryItem {
           other.type == type &&
           other.url == url &&
           other.detailPhotoUrl == detailPhotoUrl &&
+          other.showDetailButton == showDetailButton &&
           other.isViewed == isViewed;
 
   @override
-  int get hashCode => Object.hash(id, type, url, detailPhotoUrl, isViewed);
+  int get hashCode => Object.hash(id, type, url, detailPhotoUrl, showDetailButton, isViewed);
 
   @override
   String toString() => 'StoryItem(id: $id, type: ${type.name}, url: $url, detailPhotoUrl: $detailPhotoUrl, isViewed: $isViewed)';

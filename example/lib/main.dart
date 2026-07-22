@@ -27,6 +27,7 @@ List<StoryUser> buildMockUsers() {
     StoryUser(
       id: 'me',
       username: 'You',
+      // Avatar photo URL (avatarPhotoUrl karşılığı)
       avatarUrl: 'https://i.pravatar.cc/150?img=12',
       isCurrentUser: true,
       stories: <StoryItem>[StoryItem.image(id: 'me-1', url: img(101))],
@@ -34,14 +35,20 @@ List<StoryUser> buildMockUsers() {
     StoryUser(
       id: 'u1',
       username: 'alice',
+      // Avatar photo URL (avatarPhotoUrl karşılığı)
       avatarUrl: 'https://i.pravatar.cc/150?img=5',
       stories: <StoryItem>[
         StoryItem.image(
           id: 'u1-1',
+          // Story photo URL (storyPhotoUrl karşılığı)
           url: img(11),
+          // Detail photo URL (storyDetailPhotoUrl karşılığı)
+          detailPhotoUrl: img(111),
+          // Detail butonu link'e bağlı olmadan görünür.
+          showDetailButton: true,
           duration: const Duration(seconds: 5),
           createdAt: DateTime.now().subtract(const Duration(minutes: 10)),
-          link: const StoryLink(url: 'https://flutter.dev', label: 'Detayları incele'),
+          // link verilmedi; buton detailPhotoUrl üzerinden açılacak.
           metadata: const <String, Object?>{
             'title': 'İkinci Periyodik Bakımınızda %5 İndirim!',
             'dateRange': '01.06.2025 - 01.06.2026',
