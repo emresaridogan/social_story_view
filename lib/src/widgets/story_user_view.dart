@@ -599,7 +599,7 @@ class _StoryUserViewState extends State<StoryUserView> with SingleTickerProvider
                       children: <Widget>[
                         if (item.showDetailButton)
                           StoryLinkButton(
-                            link: detailLink ?? StoryLink(url: '', label: ''),
+                            link: detailLink ?? StoryLink(url: '', label: 'Detayları incele', icon: null),
                             onTap: () =>
                                 widget.onStoryButtonTap != null && detailLink != null ? widget.onStoryButtonTap!(item, detailLink) : null,
                           ),
